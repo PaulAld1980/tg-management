@@ -11,6 +11,8 @@ services:
   backend:
     build: ./backend
     container_name: tg_support_backend
+    env_file:
+      - .env
     volumes:
       - ./backend:/app # Пробрасываем файлы, чтобы изменения в коде подхватывались на лету
     ports:
