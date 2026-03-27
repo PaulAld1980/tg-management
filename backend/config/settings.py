@@ -37,6 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'corsheaders',
+    'accounts',
 ]
 
 MIDDLEWARE = [
@@ -115,3 +118,26 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# Указываем свою модель вместо дефолтной
+AUTH_USER_MODEL = 'accounts.User'
+
+# Базовые настройки DRF и механизмов защиты
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1), # Доступ живет 1 день
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7), # Токен продления живет 7 дней
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+# Снимаем защиту портов, чтобы Джанго (8000) не отторгал запросы от Vue (5173)
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+]

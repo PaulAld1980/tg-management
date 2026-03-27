@@ -1,0 +1,44 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: tg_support_db
+    env_file:
+      - .env
+    ports:
+      - "5433:5432"
+    restart: always
+
+  backend:
+    build: ./backend
+    container_name: tg_support_backend
+    volumes:
+      - ./backend:/app # Пробрасываем файлы, чтобы изменения в коде подхватывались на лету
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    restart: always
+
+  frontend:
+    build: ./frontend
+    container_name: tg_support_frontend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules # Чтобы локальная папка node_modules не затирала ту, что в контейнере
+    ports:
+      - "5173:5173"
+    environment:
+      - CHOKIDAR_USEPOLLING=true # Помогает Vue быстрее замечать изменения файлов
+    depends_on:
+      - backend
+    restart: always
+
+  bot:
+    build: ./bot
+    container_name: tg_support_bot
+    volumes:
+      - ./bot:/app
+    depends_on:
+      - db
+      - backend
+    restart: always
